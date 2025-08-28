@@ -85,6 +85,14 @@ def create_password_view(request):
     if request.method == 'POST':
         form = PasswordForm(request.POST)
         if form.is_valid():
+            # Check if user already exists (prevent duplicate)
+            if email and CustomUser.objects.filter(email=email).exists():
+                form.add_error(None, "Email already registered.")
+                return render(request, 'app_login/create_password.html', {'form': form})
+            if phone and CustomUser.objects.filter(phone=phone).exists():
+                form.add_error(None, "Phone already registered.")
+                return render(request, 'app_login/create_password.html', {'form': form})
+            # Create user only after confirmation
             if email:
                 user = CustomUser.objects.create(email=email)
             else:
@@ -92,6 +100,9 @@ def create_password_view(request):
             user.set_password(form.cleaned_data['password'])
             user.save()
             request.session['user_id'] = user.id
+            # Remove confirmation from session
+            request.session.pop('confirmed_email', None)
+            request.session.pop('confirmed_phone', None)
             return redirect('complete_profile')
     else:
         form = PasswordForm()
