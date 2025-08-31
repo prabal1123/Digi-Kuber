@@ -17,7 +17,7 @@ def is_email_or_phone(value):
     return None
 
 def home_view(request):
-    return render(request, 'app_login/home.html')
+    return render(request, 'home.html')
 
 def send_confirmation_email(email, token):
     link = f"http://localhost:8000/auth/confirm-email/?token={token}"

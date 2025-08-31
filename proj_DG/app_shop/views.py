@@ -1,14 +1,13 @@
 import os
-from django.shortcuts import render, redirect
-from django.utils import timezone
-from .models import APIToken
-from dotenv import load_dotenv
+import json
 import requests
+from .utils import auth_api, make_post
+from .models import APIToken
 from datetime import timedelta
+from django.utils import timezone
+from django.shortcuts import render, redirect
 
-load_dotenv()
-
-TOKEN_VALIDITY_MINUTES = 30  # Set token validity duration as per API docs
+TOKEN_VALIDITY_MINUTES = 10
 
 def buy_now_view(request):
     if not request.user.is_authenticated:
@@ -21,25 +20,31 @@ def buy_now_view(request):
 
     if not token_obj:
         # Request new token from API
-        partner_id = os.getenv('PARTNER_ID')
-        username = os.getenv('API_USERNAME')
-        password = os.getenv('API_PASSWORD')
-        response = requests.post(
-            'https://thirdparty.example.com/api/auth',
-            json={
-                'partner_id': partner_id,
-                'username': username,
-                'password': password
-            }
-        )
-        if response.status_code == 200:
-            token = response.json().get('token')
-            token_obj = APIToken.objects.create(token=token)
+        auth_status, auth_res = auth_api()
+        if auth_status == 200:
+            # token = auth_res.get('sessionID')
+            token_obj = APIToken.objects.create(token=auth_res)
         else:
-            return render(request, 'app_shop/token_error.html', {'error': response.text})
+            return render(request, 'app_shop/token_error.html', {'error': auth_res.get('error')})
+    
+    gold_price = make_post(token_obj.token, 'GOLD_PRICE_ENDPOINT', {"timeFrame": "1D"})
 
+    if gold_price:
+        try:
+            request_data = json.loads(gold_price)
+            if isinstance(request_data, list) and request_data:
+                price = request_data[0].get('buy_pretax')
+            else:
+                price = None
+        except Exception as e:
+            price = None
+            print("JSON decode error:", e)
+    else:
+        price = None
+
+    print(gold_price, price)
     # Token is now available, proceed to product page
-    return redirect('product_page')  # Use your product page URL name
+    return render(request, 'app_shop/product_page.html', {'price': price})
 
 def product_page_view(request):
     return render(request, 'app_shop/product_page.html')
