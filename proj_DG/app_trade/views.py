@@ -19,25 +19,27 @@ def post_login_handler(request):
 def saveQuote(request, quote_data):
     Quote.objects.create(
             currencyPair=quote_data['currency_pair'],
-            basePrice=quote_data['base_price'],
+            basePrice=quote_data['unit-price'],
             quantity=quote_data['quantity'],
             value=quote_data['value'],
             tax1Perc=quote_data['tax1_perc'],
             tax2Perc=quote_data['tax2_perc'],
-            sessionKey=request.session.session_key  # Track session for guest users
+            sessionKey=request.session.session_key,  # Track session for guest users
             user=quote_data['user'] if 'user' in quote_data else None,  # None if not logged in
-            customer_ref_no=quote_data['customer_ref_no'] if 'customer_ref_no' in quote_data else None  # None if not logged in
+            customerRefNo=quote_data['customer_ref_no'] if 'customer_ref_no' in quote_data else None  # None if not logged in
         )
 
 def validate_quote(request):
     quote_data = {
-        'base_price': request.POST.get('today-price'),
+        'unit-price': request.POST.get('unit-price'),
         'quantity': request.POST.get('quantity'),
         'value': request.POST.get('pre-tax-amount'),
         'tax1_perc': request.POST.get('tax1Perc'),
         'tax2_perc': request.POST.get('tax2Perc'),
         'currency_pair': request.POST.get('currency-pair'),
     }
+    print("Quote Data Received for Validation:**************************************")
+    print(quote_data)
 
     if not request.user.is_authenticated:
         saveQuote(request, quote_data)  # Save current quote data to db in Quote model
@@ -64,23 +66,7 @@ def validate_quote(request):
     else:
         return redirect('quote_editor')  # or some other appropriate page
 
-# def validateQuote(request):
-#     if not request.user.is_authenticated:
-#         # Save current quote data to session
-#         quote_data = {
-#             'quantity': request.POST.get('quantity'),
-#             'amount': request.POST.get('amount'),
-#             'quoteId': request.POST.get('quoteId'),
-#             # Add other fields as needed
-#         }
-#         request.session['pending_quote'] = quote_data
-#         # Save where to return after login
-#         request.session['next'] = reverse('quote_editor')  # or use request.path
-#         return redirect('signin')
-#     else:
-#         profile = Profile.objects.get(user=request.user)
-#         if not profile.customerRefNo:
-#             messages.error(request, "Please update your profile with Customer Reference Number.")
-#             return redirect('profile')
-#         else:
-#             pass # proceed to new code to validate API call
+# Save where to return after login
+# request.session['pending_quote'] = quote_data
+# request.session['next'] = reverse('quote_editor')  # or use request.path
+# return redirect('signin')

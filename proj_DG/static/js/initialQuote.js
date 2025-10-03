@@ -1,17 +1,17 @@
 // Initially disable inputs
 function disableInputs() {
-    document.getElementById('quantity').disabled = true;
-    document.getElementById('today-price').disabled = true;
-    document.getElementById('pre-tax-amount').disabled = true;
-    document.getElementById('tax1-amt').disabled = true;
-    document.getElementById('tax2-amt').disabled = true;
-    document.getElementById('total-tax-amt').disabled = true;
-    document.getElementById('total-amt').disabled = true;
+    document.getElementById('quantity').readOnly = true;
+    document.getElementById('today-price').readOnly = true;
+    document.getElementById('pre-tax-amount').readOnly = true;
+    document.getElementById('tax1-amt').readOnly = true;
+    document.getElementById('tax2-amt').readOnly = true;
+    document.getElementById('total-tax-amt').readOnly = true;
+    document.getElementById('total-amt').readOnly = true;
 }
 
 function enableInputs() {
-    document.getElementById('quantity').disabled = false;
-    document.getElementById('pre-tax-amount').disabled = false;
+    document.getElementById('quantity').readOnly = false;
+    document.getElementById('pre-tax-amount').readOnly = false;
     document.getElementById('edit-quote').hidden = true;
 }
 
