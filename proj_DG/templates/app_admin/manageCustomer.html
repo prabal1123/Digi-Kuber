@@ -9,6 +9,10 @@
                 <th>Reference Number</th>
                 <th>Create Profile</th>
                 <th>Get Profile</th>
+                <th>Activate Customer</th>
+                <th>Deactivate Customer</th>
+                <th>Validate KYC</th>
+                <th>Invalidate KYC</th>
             </tr>
         </thead>
         <tbody>
@@ -26,6 +30,30 @@
                     <form method="post" action="{% url 'fetch_profile' customer.customerRefNo %}">
                         {% csrf_token %}
                         <button type="submit">Get</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="{% url 'activateCustomer' customer.customerRefNo %}">
+                        {% csrf_token %}
+                        <button type="submit">Activate</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="{% url 'deActivateCustomer' customer.customerRefNo %}">
+                        {% csrf_token %}
+                        <button type="submit">Deactivate</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="{% url 'validateKYC' customer.customerRefNo %}">
+                        {% csrf_token %}
+                        <button type="submit">Validate</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="{% url 'inValidateKYC' customer.customerRefNo %}">
+                        {% csrf_token %}
+                        <button type="submit">Invalidate</button>
                     </form>
                 </td>
             </tr>

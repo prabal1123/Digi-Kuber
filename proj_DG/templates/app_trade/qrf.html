@@ -1,0 +1,10 @@
+{% include "base.html" %}
+{% block content %}
+  <h1>Quotation Request Form</h1>
+  <p>Edit Quantity or Amount.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Validate</button>
+    </form>
+{% endblock %}

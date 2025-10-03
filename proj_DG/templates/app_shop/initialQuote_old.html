@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class=" row mt-5">
+    <h2>Initial Quote for 1 Gram</h2>
+    <p>Quote ID: {{ estimate.quoteId }}</p>
+    <p>Created At: {{ estimate.createdAt }}</p>
+    <p>Click on edit quote to modify for your amount or quantity</p>
+    
+    {% if estimate %}
+    <div class="col-md-6">
+        {% if estimate.currencyPair == "XAU/INR" %}
+            <h5>Gold (XAU) to Indian Rupee (INR)</h5>
+        {% elif estimate.currencyPair == "XAG/INR" %}
+            <h5>Silver (XAG) to Indian Rupee (INR)</h5>
+        {% else %}
+            <h5>{{ estimate.currencyPair }}</h5>
+        {% endif %}
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Unit Price</th>
+            </tr>
+            <tr><td>Quantity</td><td>{{ estimate.quantity }}</td></tr>
+            <tr><td>Tax Type</td><td>{{ estimate.taxType }}</td></tr>
+            <tr><td>Pre-Tax Amount</td><td>{{ estimate.preTaxAmount }}</td></tr>
+            <tr><td>Tax 1 Amount</td><td>{{ estimate.tax1Amt }}</td><td>@ {{ estimate.tax1Perc }}%</td></tr>
+            <tr><td>Tax 2 Amount</td><td>{{ estimate.tax2Amt }}</td><td>@ {{ estimate.tax2Perc }}%</td></tr>
+            <tr><td>Total Tax Amount</td><td>{{ estimate.taxAmount }}</td></tr>
+            <tr><td>Total Amount</td><td>{{ estimate.totalAmount }}</td></tr>
+        </table>
+    </div>
+    
+    {% else %}
+        <p>No estimate data available.</p>
+    {% endif %}
+    <a href="#" class="card-link">Edit Quote</a>
+</div>
+{% endblock %}

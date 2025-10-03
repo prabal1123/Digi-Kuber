@@ -27,6 +27,7 @@
                     <th>Currency Pair</th>
                     <th>Balance Quantity</th>
                     <th>Blocked Quantity</th>
+                    <th>Balance As Of Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,6 +39,7 @@
                         <td>{{ balance.currency_pair }}</td>
                         <td>{{ balance.bal_quantity }}</td>
                         <td>{{ balance.blocked_quantity }}</td>
+                        <td>{{ balance.date_created }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

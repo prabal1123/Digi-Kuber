@@ -37,10 +37,11 @@ def get_token():
             # print("Failed to obtain initial token")
             return render(request, 'app_shop/token_error.html', {'error': auth_res.get('error')})
 
-def make_post(token, endpoint, payload, fetchId=None, fetchVal=None):
+def make_post(endpoint, payload, fetchId=None, fetchVal=None):
     base_url = ExternalAPI.EXTERNAL_APIS['BASE_URL']
     ep = ExternalAPI.EXTERNAL_APIS[endpoint]
     url = f"{base_url}{ep}"
+    token = get_token().token
     print("Making POST request to:", ep)
     headers = {
             'Accept': 'application/json',
@@ -51,24 +52,46 @@ def make_post(token, endpoint, payload, fetchId=None, fetchVal=None):
         headers['mobileNumber'] = fetchVal
     elif fetchId is not None and fetchId == "customerRefNo":
         headers['customerRefNo'] = fetchVal
-    else:
-        pass
-    print(headers)
+
     try:
         response = requests.post(url, json=payload, headers=headers)
-        print(response)
+        # print("Status Code:", response.status_code)
+        # print("###############################################################")
+        # print("Response recieved:", response)
+        # print("###############################################################")
+        # # print("Response Content-Type:", response.headers['Content-Type'])
+        # print(response.text) 
+        # print("###############################################################")
+        
         if response.status_code == 200:
-            data = response.json()  # Or response.text, depending on API
-            # print("Status Code:", response.status_code)
-            # print("Response Body:", response.text)
-            return response.text
-        else:
-            print(f"Error: {response.status_code} - {response.text}")
-            return None
+            try:
+                request_data = response.json()
+                return_value = {}
+                return_value["status"] = response.status_code
+                return_value["code"] = "Success"
+                return_value["data"] = request_data
+                return return_value
+            except Exception as e:
+                if response.text == "OK":
+                    return_value = {}
+                    return_value["status"] = response.status_code
+                    return_value["code"] = "Success"
+                    return_value["reason"] = response.text
+                    return return_value
+                else:
+                    print("JSON decode error:", e)
+                    return None
+        elif response.status_code == 400:
+            request_data = response.json()
+            return_value = {}
+            return_value["status"] = response.status_code
+            return_value["code"] = request_data.get("code")
+            return_value["reason"] = request_data.get("reason")
+            return return_value
 
     except requests.RequestException as e:
         print(f"Request failed: {e}")
-        return None
+        return (f"Request failed: {e}")
 
 def auth_api():
 

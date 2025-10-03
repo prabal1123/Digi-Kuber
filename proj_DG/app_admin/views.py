@@ -1,19 +1,42 @@
 from app_user.models import Profile
 from django.conf import settings
+from django.contrib import messages
 from app_shop.utils import make_post, auth_api, get_token
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
+def prepRequest(request, custRefID):
+    customer = get_object_or_404(Profile, customerRefNo = custRefID)
+    mobile = customer.user.phone
+    refNo = customer.customerRefNo
+    payload={}
+    if refNo is None:
+        fetchId = "mobile"
+        fetchVal = mobile
+    else:
+        fetchId = "customerRefNo"
+        fetchVal = refNo
+    return (fetchId, fetchVal)  
+
+def parseResp(response):
+    print("Response in parseResp:", response)
+    if response.status == 400:
+        code = response.get("code")
+        reason = response.get("reason")
+        messages.warning(request, reason)
+    else:
+        messages.success(request, reason)
+    return reason
+
 @login_required
-def createCustomerView(request):
+def manageCustomerView(request):
     # Get all users where profile exists and dgcustomerRefNo is null
-    customers = Profile.objects.filter(dgcustomerRefNo__isnull=True)
-    return render(request, 'app_admin/createCustomer.html', {'customers': customers})
+    customers = Profile.objects.all()
+    return render(request, 'app_admin/manageCustomer.html', {'customers': customers})
 
 @login_required
 def createProfileView(request, user_id):
     customer = get_object_or_404(Profile, customerRefNo = user_id)
-    tokenObj = get_token()
     if customer.kycStatus == 1:
         kycStatus = 'Y'
     else:
@@ -35,7 +58,7 @@ def createProfileView(request, user_id):
         "billingAddress": customer.billingAddress,
     }
     print("Payload:", payload)
-    resp = make_post(token=tokenObj.token, endpoint='CREATE_PROFILE_ENDPOINT', payload=payload)
+    resp = make_post(endpoint='CREATE_PROFILE_ENDPOINT', payload=payload)
     print(resp)
     if resp:
         try:
@@ -92,3 +115,32 @@ def updateDgCustId(request):
     customer.save()
     print("Updated")
     return redirect('home')
+
+def activateCustomer(request, user_id):
+    fetchId, fetchVal = prepRequest(request, custRefID=user_id)
+    payload={}
+    response = make_post(endpoint='ACTIVATE_CUSTOMER_ENDPOINT', payload=payload, fetchId=fetchId, fetchVal=fetchVal)
+    reason = parseResp(response)
+    return redirect('manageCustomer')
+
+def deActivateCustomer(request, user_id):
+    fetchId, fetchVal = prepRequest(request, custRefID=user_id)
+    payload={}
+    response = make_post(endpoint='DEACTIVATE_CUSTOMER_ENDPOINT', payload=payload, fetchId=fetchId, fetchVal=fetchVal)
+    reason = parseResp(response)
+    return redirect('manageCustomer')
+
+def validateKYC(request, user_id):
+    fetchId, fetchVal = prepRequest(request, custRefID=user_id)
+    payload={}
+    response = make_post(endpoint='VALIDATE_CUSTOMER_ENDPOINT', payload=payload, fetchId=fetchId, fetchVal=fetchVal)
+    reason = parseResp(response)
+    return redirect('manageCustomer')
+
+def inValidateKYC(request, user_id):
+    fetchId, fetchVal = prepRequest(request, custRefID=user_id)
+    payload={}
+    response = make_post(endpoint='INVALIDATE_CUSTOMER_ENDPOINT', payload=payload, fetchId=fetchId, fetchVal=fetchVal)
+    reason = parseResp(response)
+    return redirect('manageCustomer')
+

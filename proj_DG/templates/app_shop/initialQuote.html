@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mt-5">
+    <h2>Initial Quote for 1 Gram</h2>
+    <p>Quote ID: {{ estimate.quoteId }}</p>
+    <p>Created At: {{ estimate.createdAt }}</p>
+    <p>Click on edit quote to modify for your amount or quantity</p>
+    
+    {% if estimate %}
+    <div class="col-md-6">
+        <input type="hidden" name="currency-pair" value="{{ estimate.currencyPair }}">
+        {% if estimate.currencyPair == "XAU/INR" %}
+            <h5>Gold (XAU) to Indian Rupee (INR)</h5>
+        {% elif estimate.currencyPair == "XAG/INR" %}
+            <h5>Silver (XAG) to Indian Rupee (INR)</h5>
+        {% else %}
+            <h5>{{ estimate.currencyPair }}</h5>
+        {% endif %}
+
+        <table id="quote-details">
+            <tr>
+                <th>Type</th>
+                <th>Unit Price</th>
+            </tr>
+            <tr>
+                <td>Today's Price</td>
+                <td><input type="number" id="today-price" value="{{ estimate.preTaxAmount }}" disabled/></td>
+            </tr>
+            <tr>
+                <td>Quantity</td>
+                <td><input type="number" id="quantity" value="{{ estimate.quantity }}" disabled/></td>
+            </tr>
+            <tr>
+                <td>Pre-Tax Amount</td>
+                <td><input type="number" id="pre-tax-amount" value="{{ estimate.preTaxAmount }}" disabled/></td>
+            </tr>
+            <tr>
+                <td>Tax Type</td>
+                <td>{{ estimate.taxType }}</td>
+            </tr>
+            <tr>
+                <td>Tax 1 Amount</td>
+                <td><input type="number" id="tax1-amt" value="{{ estimate.tax1Amt }}" disabled/></td>
+                <td>@ {{ estimate.tax1Perc }}%</td>
+            </tr>
+            <tr>
+                <td>Tax 2 Amount</td>
+                <td><input type="number" id="tax2-amt" value="{{ estimate.tax2Amt }}" disabled/></td>
+                <td>@ {{ estimate.tax2Perc }}%</td>
+            </tr>
+            <tr>
+                <td>Total Tax Amount</td>
+                <td><input type="number" id="total-tax-amt" value="{{ estimate.taxAmount }}" disabled/></td>
+            </tr>
+            <tr>
+                <td>Total Amount</td>
+                <td><input type="number" id="total-amt" value="{{ estimate.totalAmount }}" disabled/></td>
+            </tr>
+        </table>
+        <button id="edit-quote" class="btn btn-primary">Edit Quote</button>
+        <button id="validate-quote" class="btn btn-success" style="display: none;">Validate</button>
+    </div>
+    <div id="quote-data"
+        data-tax1-perc="{{ estimate.tax1Perc }}"
+        data-tax2-perc="{{ estimate.tax2Perc }}"
+        data-unit-price="{{ estimate.preTaxAmount|floatformat:2 }}">
+    </div>
+
+    {% else %}
+        <p>No estimate data available.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

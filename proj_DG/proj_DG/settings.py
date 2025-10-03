@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'app_login',
     'app_user',
     'app_shop',
+    'app_trade',
 ]
 
 MIDDLEWARE = [
@@ -127,7 +128,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -136,3 +141,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+
+LOGIN_URL = 'signin'
+LOGIN_REDIRECT_URL = '/post-login-handler/'  # Redirect here after login
+LOGOUT_REDIRECT_URL = 'home'  # Redirect here after logout
