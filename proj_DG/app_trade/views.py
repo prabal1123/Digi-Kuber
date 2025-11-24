@@ -1,13 +1,12 @@
 import requests
-import razorpay
 from django.shortcuts import render, redirect
 from decimal import Decimal
 from datetime import timedelta
 
-from .models import TradeBuy, Quote
+from .models import Quote
 from app_user.models import Profile
 from app_shop.api_config import ExternalAPI
-from app_shop.utils import make_post, generate_transaction_ref
+from app_shop.utils import make_post, generate_transaction_ref, create_razorpay_order
 
 from django.utils import timezone
 from django.contrib import messages
@@ -40,17 +39,42 @@ def verify_payment(request):
         return JsonResponse({'status': 'failure'})
 
 def saveQuote(request, quote_data):
-    Quote.objects.create(
-            currencyPair=quote_data['currency_pair'],
-            basePrice=quote_data['unit-price'],
+    check = Quote.objects.filter(quoteId=quote_data['quoteId']).exists()
+    if check:
+        Quote.objects.filter(quoteId=quote_data['quoteId']).update(
+            customerRefNo=quote_data['customerRefNo'],
+            totalAmt=quote_data['totalAmount'],
+            preTaxAmt=quote_data['preTaxAmount'],
             quantity=quote_data['quantity'],
-            preTaxAmt=quote_data['preTaxAmt'],
-            tax1Perc=quote_data['tax1_perc'],
-            tax2Perc=quote_data['tax2_perc'],
-            sessionKey=request.session.session_key,  # Track session for guest users
-            user=quote_data['user'] if 'user' in quote_data else None,  # None if not logged in
-            customerRefNo=quote_data['customer_ref_no'] if 'customer_ref_no' in quote_data else None  # None if not logged in
-        )
+            taxAmount=float(quote_data['tax1Amt']) + float(quote_data['tax2Amt']),
+            tax1Amt=quote_data['tax1Amt'],
+            tax2Amt=quote_data['tax2Amt'],
+            isValidated=True,
+            )
+        msg = "Existing Quote updated in database."
+    else:
+        Quote.objects.create(
+            customerRefNo=quote_data['customerRefNo'],
+            totalAmt=quote_data['totalAmount'],
+            unitPriceAmt=quote_data['preTaxAmount'],
+            preTaxAmt=quote_data['preTaxAmount'],
+            quantity=quote_data['quantity'],
+            taxAmount=quote_data['taxAmount'],
+            tax1Perc=quote_data['tax1Perc'],
+            tax2Perc=quote_data['tax2Perc'],
+            tax1Amt=quote_data['tax1Amt'],
+            tax2Amt=quote_data['tax2Amt'],
+            # tax3Perc=quote_data['tax3Perc'],
+            transactionOrderID=quote_data['transactionRefNo'],
+            quoteId=quote_data['quoteId'],
+            currencyPair=quote_data['currencyPair'],
+            transactionType=quote_data['type'], #BUY/SELL/Transfer
+            taxType=quote_data.get('taxType'),
+            createdAt=quote_data['createdAt'],
+            )
+
+        msg = "New Quote saved to database."
+    return msg
 
 def generate_quote(request):
     ep = 'TRADE_BUY_ENDPOINT'
@@ -72,76 +96,51 @@ def generate_quote(request):
                 quote_data['customerRefNo'] = profile.customerRefNo
                 quote_data['transactionRefNo'] = transaction_ref
                 print(quote_data)
-                # saveQuote(request, quote_data)  # Save current quote data to db in Quote model
-
-                response = make_post(
-                    endpoint=ep, 
-                    payload=quote_data)
-                print("Response from Trade Buy API:", response)
+                response = make_post(endpoint=ep, payload=quote_data)
+                print("Response from Trade Buy API:", response['data'])
+                if response.get("data"):
+                    saveQuote(request, response['data'])  # Save the quote data to the database
+                else:
+                    messages.error(request, "Failed to generate quote.")
+                    return redirect('chk_price')
 
             return render(request, 'app_shop/validateQuote.html', {'estimate': response['data']})
     return render(request, 'app_shop/validateQuote.html', {'estimate': response['data']})
 
 def validate_quote(request):
-    validate_data = { 
-        "customerRefNo": "{{customerRefNo}}", 
-        "calculationType": "Q", 
-        "preTaxAmount": request.POST.get('pre-tax-amount'),
-        "quantity": request.POST.get('quantity'),
-        "quoteId": "PTMgyuCtlvNKjK9B1xovWic8a", 
-        "tax1Amt": request.POST.get('tax1Perc'),
-        "tax2Amt": request.POST.get('tax2Perc'),
-        "transactionDate": "2023-03-24T08:51:56.469Z", 
-        "transactionOrderID": "3c30177f-1e97-4638-b322-22d0b556dc03", 
-        "totalAmount": request.POST.get('pre-tax-amount')
-        }
-
-    # print("Quote Data Received for Validation:**************************************")
-    # print(quote_data)
-
+    ep = 'TRADE_VALIDATE_ENDPOINT_PG'
     if not request.user.is_authenticated:
         messages.info(request, "Please sign in to proceed with the quote validation.")
         return redirect('signin')  # Or your login/signup route
     elif request.method == 'POST':
-        profile = Profile.objects.get(user=request.user)
-        quote_data['customer_ref_no'] = profile.customerRefNo
-        print(quote_data)
-        saveQuote(request, quote_data)  # Save current quote data to db in Quote model
-        pre_tax_total = Decimal(quote_data['preTaxAmt']) * Decimal(quote_data['quantity'])
-        tax1_amt = pre_tax_total * Decimal(quote_data['tax1_perc']) / Decimal(100)
-        tax2_amt = pre_tax_total * Decimal(quote_data['tax2_perc']) / Decimal(100)
-        total_tax = tax1_amt + tax2_amt
-        total_amount = pre_tax_total + total_tax
-        isValid, response = make_post(
-            endpoint=settings.EXTERNAL_APIS['TRADE_VALIDATE_ENDPOINT_PG'], 
-            data=quote_data) 
-        return redirect('quote_confirm')
-    else:
-        return redirect('quote_editor')  # or some other appropriate page
+        validate_data = {
+            "customerRefNo": request.POST.get('cid'), 
+            "calculationType": "Q", 
+            "preTaxAmount": request.POST.get('pta'),
+            "quantity": request.POST.get('qty'),
+            "quoteId": request.POST.get('qid'), 
+            "tax1Amt": request.POST.get('cgstAmt'),
+            "tax2Amt": request.POST.get('sgstAmt'),
+            "transactionDate": request.POST.get('createdAt'), 
+            "transactionOrderID": request.POST.get('tid'), 
+            "totalAmount": request.POST.get('totalAmount')
+            }
+        print("Quote Data Received for Validation:**************************************")
+        print(validate_data)
+        print(validate_data['totalAmount'])
+        response = make_post(endpoint=ep, payload=validate_data)
+        print("Response from Trade Validate API:", response)
+        if response.get("status") == 200:
+            saveQuote(request, validate_data)  # Save current quote data to db in Quote model
+            orderId = create_razorpay_order(amount=validate_data['totalAmount']*100)
+            return redirect('payment_page')
+        else:
+            messages.error(request, "Quote validation failed. Please try again.")
+            return redirect('chk_price')  # or some other appropriate page
+    # else:
+    #     return redirect('chk_price')  # or some other appropriate page
 
-# Payment Page View
-def create_order(request):
-    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-    if request.method == "POST":
-        amount = 1000  # Amount in paise (₹10)
-        currency = "INR"
 
-        # Create an order with Razorpay
-        order = client.order.create(dict(
-            amount=amount,
-            currency=currency,
-            payment_capture='1'  # '1' means automatic payment capture
-        ))
-
-        order_id = order['id']
-
-        # Pass the order_id and Razorpay key to the front-end
-        return JsonResponse({
-            'order_id': order_id,
-            'razorpay_key': settings.RAZORPAY_KEY_ID
-        })
-
-    return render(request, 'payment_page.html')
 
 

@@ -18,26 +18,31 @@
         {% endif %}
 
         <div class="col-md-12 form-group">
-            <div><label for="price">Unit Price (INR):</label></div>
+            <div class="mt-2"><label for="price">Unit Price (INR):</label></div>
             <div><input type="number" id="price" value="{{ estimate.preTaxAmount }}" readonly></div>
-            <div><label for="qty">Quantity (in Grams):</label></div>
+            <div class="mt-2"><label for="qty">Quantity (in Grams):</label></div>
             <div><input type="number" name="qty" id="qty" value="{{ estimate.quantity }}" step="1" oninput="handleInput('qty')"></div>
-            <div><label for="pta">Pre-Tax Amount (INR):</label></div>
+            <div class="mt-2"><label for="pta">Pre-Tax Amount (INR):</label></div>
             <div><input type="number" name="pta" id="pta" value="{{ estimate.preTaxAmount }}" step="0.01" oninput="handleInput('pta')"></div>
-            <div><label for="cgstAmt">CGST @ {{ estimate.tax1Perc }} (%): </label></div>
+            <div class="mt-2"><label for="cgstAmt">CGST @ {{ estimate.tax1Perc }} (%): </label></div>
             <div><input type="number" name="cgstAmt" id="cgstAmt" value="{{ estimate.tax1Amt }}" readonly></div>
-            <div><label for="sgstAmt">SGST @ {{ estimate.tax2Perc }} (%): </label></div>
+            <div class="mt-2"><label for="sgstAmt">SGST @ {{ estimate.tax2Perc }} (%): </label></div>
             <div><input type="number" name="sgstAmt" id="sgstAmt" value="{{ estimate.tax2Amt }}" readonly></div>
-            <div><label for="taxAmount">Total Tax (INR):</label></div>
+            <div class="mt-2"><label for="taxAmount">Total Tax (INR):</label></div>
             <div><input type="text" name="taxAmount" id="taxAmount" readonly value="{{ estimate.taxAmount }}"></div>
-            <div><label for="totalAmount">Total Amount (INR):</label></div>
+            <div class="mt-2"><label for="totalAmount">Total Amount (INR):</label></div>
             <div><input type="text" name="totalAmount" id="totalAmount" readonly value="{{ estimate.totalAmount }}"></div>
-		</div>
-        <button id="validate-quote" class="btn btn-success" type="submit">Confirm and Pay</button>
-        <div style="margin-top: 10px; text-align: center;"><p>Quote ID: {{ estimate.quoteId }}</p></div>
-        <div style="margin-top: 10px; text-align: center;"><p>Transaction Ref No: {{ estimate.transactionRefNo }}</p></div>
-        <div style="margin-top: 10px; text-align: center;"><p>Customer Ref No: {{ estimate.customerRefNo }}</p></div>
-        <div style="margin-top: 10px; text-align: center;"><p>Created At: {{ estimate.createdAt }}</p></div>
+            <div class="mt-2"><button id="validate-quote" class="btn btn-success" type="submit">Confirm and Pay</button></div>
+        </div>
+        
+        <div style="margin-top: 10px"><label for="qid">Quote ID:</label></div>
+        <div><input type="text" name="qid" id="qid" value="{{ estimate.quoteId }}" readonly></div>
+        <div style="margin-top: 10px"><label for="tid">Transaction Ref No:</label></div>
+        <div><input type="text" name="tid" id="tid" value="{{ estimate.transactionRefNo }}" readonly></div>
+        <div style="margin-top: 10px"><label for="cid">Customer Ref No:</label></div>
+        <div><input type="text" name="cid" id="cid" value="{{ estimate.customerRefNo }}" readonly></div>
+        <div style="margin-top: 10px"><label for="createdAt">Created At:</label></div>
+        <div><input type="text" name="createdAt" id="createdAt" value="{{ estimate.createdAt }}" readonly></div>
     </div>
     
     <div id="quote-data"

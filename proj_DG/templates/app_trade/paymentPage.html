@@ -8,46 +8,8 @@
 </head>
 <body>
     <h2>Pay Now</h2>
-    <button id="pay-button">Pay ₹10</button>
+    <button id="pay-button">Pay</button>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-        // Get the order details
-        document.getElementById('pay-button').onclick = function () {
-            fetch('/create_order/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                var options = {
-                    "key": data.razorpay_key, // Your Razorpay key
-                    "amount": 1000,  // Amount in paise
-                    "currency": "INR",
-                    "order_id": data.order_id,
-                    "handler": function (response) {
-                        // Handle successful payment here
-                        alert("Payment Successful: " + response.razorpay_payment_id);
-                    },
-                    "prefill": {
-                        "name": "John Doe",  // Prefill customer details if necessary
-                        "email": "john@example.com",
-                        "contact": "9876543210"
-                    },
-                    "notes": {
-                        "address": "Payment for Order #1234"
-                    },
-                    "theme": {
-                        "color": "#F37254"
-                    }
-                };
-
-                var rzp1 = new Razorpay(options);
-                rzp1.open();
-            });
-        }
-    </script>
 </body>
 </html>

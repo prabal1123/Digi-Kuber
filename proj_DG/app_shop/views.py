@@ -7,7 +7,6 @@ from django.utils import timezone
 from app_user.models import Profile
 from django.contrib import messages
 from .models import APIToken, Balance
-from app_trade.models import TradeBuy
 from app_trade.views import saveQuote
 from django.shortcuts import render, redirect, get_object_or_404
 from .utils import auth_api, make_post, get_token, generate_transaction_ref
@@ -104,12 +103,16 @@ def tradeEstimateView(request, param1=None):
                 }
             # print(quote_data)
             response = make_post('TRADE_BUY_ENDPOINT', payload=quote_data)
-
-            # saveQuote(request, quote_data)  # Save current quote data to db in Quote model
             quote_data = response["data"]
             quote_data['customerRefNo'] = profile.customerRefNo
             quote_data['transactionRefNo'] = transaction_ref
+            quote_data['currencyPair'] = cp
             print("Response from Trade Buy API:", quote_data)
+            if response.get("data"):
+                saveQuote(request, quote_data)  # Save the quote data to the database
+            else:
+                messages.error(request, "Failed to generate quote.")
+                return redirect('chk_price')
 
             return render(request, 'app_shop/initialQuote.html', {'estimate': quote_data})
         except Profile.DoesNotExist:

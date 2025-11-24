@@ -7,54 +7,28 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Quote(models.Model):
-    user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
-    customerRefNo = models.CharField(max_length=512, null=True, blank=True)
-    currencyPair = models.CharField(max_length=10)
+    # user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
+    customerRefNo = models.CharField(max_length=512, null=True, blank=True, default="DummyRefNo")
     calculationType = models.CharField(max_length=1, default='A', null=True, blank=True)  # 'A' for Amount, 'Q' for Quantity
+    unitPriceAmt = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     preTaxAmt = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    taxAmount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     quantity = models.DecimalField(max_digits=10, decimal_places=4, default=1.0000)
     totalAmt = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     tax1Perc = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     tax2Perc = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     tax3Perc = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
-    tax1Perc = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
-    tax2Perc = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
-    tax3Perc = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
-    transactionDate = models.DateTimeField(null=True, blank=True)
-    transactionOrderID = models.CharField(max_length=512, null=True, blank=True)
+    tax1Amt = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    tax2Amt = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    tax3Amt = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    transactionOrderID = models.CharField(max_length=512, null=True, blank=True, default="DefaultOrderID")
     isValidated = models.BooleanField(default=False)
-    createdAt = models.DateTimeField(auto_now_add=True)
+    quoteId = models.CharField(max_length=512, null=True, blank=True, default="DefaultQuoteID")
+    currencyPair = models.CharField(max_length=10, default="INR")
+    taxType = models.CharField(max_length=50, null=True, blank=True)
+    transactionType = models.CharField(max_length=10, default="BUY")
+    createdAt = models.DateTimeField(default=None, null=True, blank=True) #from API
+    transactionDate = models.DateTimeField(auto_now_add=True, null=True, blank=True) #when saved to DB
 
     def __str__(self):
         return f"Quote #{self.id} - {self.quantity}"
-
-
-class TradeBuy(models.Model):
-    customerRefNo = models.CharField(max_length=512)
-    transactionRefNo = models.CharField(max_length=512, null=True, blank=True)
-    value = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
-    currencyPair = models.CharField(max_length=10)
-    calculationType = models.CharField(max_length=1, default='A')
-    preTaxAmount = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    quantity = models.DecimalField(max_digits=20, decimal_places=4, null=True, blank=True)
-    quoteId = models.CharField(max_length=512, null=True, blank=True)
-    tax1Amt = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    tax2Amt = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    tax3Amt = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    billingAddressId = models.CharField(max_length=512, null=True, blank=True)
-    transactionDate = models.DateTimeField(null=True, blank=True)
-    transactionOrderID = models.CharField(max_length=512, null=True, blank=True)
-    totalAmount = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    quoteValidityTime = models.IntegerField(null=True, blank=True)
-    createdAt = models.DateTimeField(blank=True, null=True)
-
-    #quantity should be calculated field in this model based on value and preTaxAmount
-    def save(self, *args, **kwargs):
-        if self.calculationType == 'A' and self.preTaxAmount > 0:
-            self.quantity = self.value / self.preTaxAmount
-        elif self.calculationType == 'A' and self.preTaxAmount and self.preTaxAmount > 0:
-            self.value = self.quantity * self.preTaxAmount
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"TradeBuy created at {self.transactionRefNo} for Customer {self.customerRefNo}"
