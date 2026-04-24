@@ -1,1 +1,27 @@
 firebase/*.json
+# Environment files
+.env
+.env.*
+.env.staging
+
+# Django / Python
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# Database
+db.sqlite3
+
+# Virtual environment
+venv/
+.env/
+
+# Gunicorn / runtime
+gunicorn.sock
+
+# Static collected files
+staticfiles/
+
+# OS
+.DS_Store

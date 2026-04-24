@@ -1,0 +1,25 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd ~/Digi-Kuber-staging/proj_DG
+            source ../venv/bin/activate
+            git pull origin main
+            pip install -r requirements.txt
+            python3 manage.py migrate
+            sudo systemctl restart gunicorn-staging
+

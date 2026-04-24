@@ -25,7 +25,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env.staging'))
 
 PARTNER_ID = env('partner_id')
 USR_ID = env('usr_id')
@@ -33,6 +33,10 @@ PASSWORD = env('password')
 BASE_URL = env('base_url')
 RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID')
 RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET')
+# Azure Email + Frontend
+AZURE_EMAIL_CONNECTION_STRING = env('AZURE_EMAIL_CONNECTION_STRING')
+AZURE_EMAIL_SENDER = env('AZURE_EMAIL_SENDER')
+FRONTEND_URL = env('FRONTEND_URL')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
@@ -41,7 +45,19 @@ SECRET_KEY = 'django-insecure-vya#es*71+(81r$xljjikd6%2hxkt_g&_31x5qqdapqn54r(ax
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "13.203.209.236",
+    "localhost",
+    "127.0.0.1",
+    '98.91.239.3',
+    'digitalquber.com', 
+    'www.digitalquber.com',
+    ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://13.203.209.236:8080",
+]
+
 
 AUTH_USER_MODEL = 'app_login.CustomUser'
 # Application definition
@@ -101,7 +117,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
