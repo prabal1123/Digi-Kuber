@@ -56,6 +56,8 @@ ALLOWED_HOSTS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "http://13.203.209.236:8080",
+    "https://digitalquber.com",
+    "https://www.digitalquber.com",
 ]
 
 
