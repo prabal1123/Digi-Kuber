@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'app_trade',
     'app_sell',
     'app_pay',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -154,11 +155,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
+# STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -172,3 +173,20 @@ LOGIN_URL = 'signin'
 LOGIN_REDIRECT_URL = '/post-login-handler/'  # Redirect here after login
 LOGOUT_REDIRECT_URL = 'home'  # Redirect here after logout
 PROVIDER_SESSION_ID = env('provider_session_id')
+
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME')
+CLOUDFRONT_DOMAIN = env('CLOUDFRONT_DOMAIN')
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+    },
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+}
+
+STATIC_URL = f'https://{CLOUDFRONT_DOMAIN}/static/'
