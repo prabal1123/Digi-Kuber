@@ -466,10 +466,53 @@ def confirm_phone_view(request):
     return render(request, 'app_login/confirm_phone.html')
 
 
+# def create_password_view(request):
+#     email = request.session.get('confirmed_email')
+#     phone = request.session.get('confirmed_phone')
+
+#     if not email and not phone:
+#         return redirect('signup')
+
+#     if request.method == 'POST':
+#         form = PasswordForm(request.POST)
+#         if form.is_valid():
+
+#             if email and CustomUser.objects.filter(email=email).exists():
+#                 form.add_error(None, 'Email already registered')
+#                 return render(request, 'app_login/create_password.html', {'form': form})
+
+#             if phone and CustomUser.objects.filter(phone=phone).exists():
+#                 form.add_error(None, 'Phone already registered')
+#                 return render(request, 'app_login/create_password.html', {'form': form})
+
+#             if email:
+#                 user = CustomUser.objects.create(email=email)
+#             else:
+#                 user = CustomUser.objects.create(phone=phone)
+
+#             user.set_password(form.cleaned_data['password'])
+#             user.save()
+
+#             request.session['user_id'] = user.id
+#             request.session.modified = True
+#             request.session.pop('confirmed_email', None)
+#             request.session.pop('confirmed_phone', None)
+#             request.session.pop('pending_phone', None)
+
+#             #return redirect('complete_details')
+#             return redirect('complete_profile')
+
+#     else:
+#         form = PasswordForm()
+
+#     return render(request, 'app_login/create_password.html', {'form': form})
+
+
 def create_password_view(request):
     email = request.session.get('confirmed_email')
     phone = request.session.get('confirmed_phone')
 
+    # Ensure the user has actually passed the OTP verification step
     if not email and not phone:
         return redirect('signup')
 
@@ -477,6 +520,8 @@ def create_password_view(request):
         form = PasswordForm(request.POST)
         if form.is_valid():
 
+            # Double-check that the email or phone hasn't been registered 
+            # while the user was filling out the password form
             if email and CustomUser.objects.filter(email=email).exists():
                 form.add_error(None, 'Email already registered')
                 return render(request, 'app_login/create_password.html', {'form': form})
@@ -485,28 +530,33 @@ def create_password_view(request):
                 form.add_error(None, 'Phone already registered')
                 return render(request, 'app_login/create_password.html', {'form': form})
 
+            # FIX: Use create_user() instead of create() to ensure 
+            # standard user permissions (is_staff=False) are applied correctly.
             if email:
-                user = CustomUser.objects.create(email=email)
+                user = CustomUser.objects.create_user(email=email)
             else:
-                user = CustomUser.objects.create(phone=phone)
+                user = CustomUser.objects.create_user(phone=phone)
 
+            # Set the password using Django's hashing mechanism
             user.set_password(form.cleaned_data['password'])
             user.save()
 
+            # Since the app is stateless, storing the ID in the session 
+            # allows the next view to fetch the user from Supabase.
             request.session['user_id'] = user.id
             request.session.modified = True
+            
+            # Clean up verification session data
             request.session.pop('confirmed_email', None)
             request.session.pop('confirmed_phone', None)
             request.session.pop('pending_phone', None)
 
-            #return redirect('complete_details')
             return redirect('complete_profile')
 
     else:
         form = PasswordForm()
 
     return render(request, 'app_login/create_password.html', {'form': form})
-
 
 def complete_details_view(request):
     user_id = request.session.get('user_id')
