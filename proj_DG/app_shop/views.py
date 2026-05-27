@@ -46,8 +46,8 @@ def product_page_view(request):
         'gold_price': gold_price,
         'silver_price': silver_price,
         # debug info (remove in production)
-        'gold_raw': gold_raw,
-        'silver_raw': silver_raw,
+        # 'gold_raw': gold_raw,
+        # 'silver_raw': silver_raw,
     }
     return render(request, 'app_shop/product_page.html', context)
 
@@ -515,15 +515,25 @@ def tradeEstimateView(request, param1=None):
     if request.method == 'POST':
         action = request.POST.get('action')
         # quantity from form (fallback to default)
+        # qty_str = request.POST.get('quantity')
+        # try:
+        #     if qty_str:
+        #         qty = Decimal(qty_str)
+        #         if qty <= 0:
+        #             qty = default_qty
+        # except (InvalidOperation, TypeError):
+        #     qty = default_qty
+
         qty_str = request.POST.get('quantity')
+        MAX_QTY = Decimal('10000')  # max 10kg gold/silver per order
         try:
             if qty_str:
                 qty = Decimal(qty_str)
-                if qty <= 0:
-                    qty = default_qty
+                if qty <= 0 or qty > MAX_QTY:
+                    messages.error(request, "Invalid quantity. Must be between 0 and 10,000 grams.")
+                    return redirect('chk_price')
         except (InvalidOperation, TypeError):
             qty = default_qty
-
         # recalc total
         if unit_price is not None:
             total_amount = (unit_price * qty).quantize(Decimal('0.01'))  # 2 decimals

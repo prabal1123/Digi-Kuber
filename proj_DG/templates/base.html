@@ -11,10 +11,10 @@
 
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-          <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
 
-          <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     
   <style>
@@ -54,11 +54,7 @@
     box-shadow: 0 0 20px rgba(197,157,67,0.45);
     border-color: #c59d43 !important;
   }
-  
-
-
 </style>
-
 
 </head>
 
@@ -80,7 +76,17 @@
 
     <!-- PAGE CONTENT (NO CONTAINER HERE) -->
     {% block content %}{% endblock %}
-        <!-- Script tag here  -->
+
+    <!-- FLOATING WHATSAPP BUTTON -->
+    <a href="https://wa.me/+919999106669?text=Hi!%20I%20have%20a%20question%20about%20DigiKuber." 
+       class="whatsapp-float" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       title="Chat with us on WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <!-- Script tag here  -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

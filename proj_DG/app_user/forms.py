@@ -33,12 +33,25 @@ class ProfileForm(forms.ModelForm):
             'phone'
         ]
 
+
+
     # def __init__(self, *args, **kwargs):
     #     user = kwargs.pop('user', None)
     #     super().__init__(*args, **kwargs)
+
     #     if user:
+    #         # always show email
     #         self.fields['email'].initial = user.email
-    #         self.fields['phone'].initial = user.phone
+
+    #         if user.phone:
+    #             # 🔒 phone already verified → lock it
+    #             self.fields['phone'].initial = user.phone
+    #             self.fields['phone'].disabled = True
+    #             self.fields['phone'].required = False
+    #         else:
+    #             # 🔓 email signup → phone required
+    #             self.fields['phone'].disabled = False
+    #             self.fields['phone'].required = True
 
 
     def __init__(self, *args, **kwargs):
@@ -46,15 +59,30 @@ class ProfileForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if user:
-            # always show email
             self.fields['email'].initial = user.email
 
             if user.phone:
-                # 🔒 phone already verified → lock it
                 self.fields['phone'].initial = user.phone
                 self.fields['phone'].disabled = True
                 self.fields['phone'].required = False
             else:
-                # 🔓 email signup → phone required
                 self.fields['phone'].disabled = False
                 self.fields['phone'].required = True
+
+    def clean_bZip(self):
+        zip_val = self.cleaned_data.get('bZip', '').strip()
+        if zip_val:
+            if not zip_val.isdigit():
+                raise forms.ValidationError("Billing zip must be numeric.")
+            if not (100000 <= int(zip_val) <= 999999):
+                raise forms.ValidationError("Billing zip must be a valid 6-digit Indian pincode.")
+        return zip_val
+
+    def clean_dZip(self):
+        zip_val = self.cleaned_data.get('dZip', '').strip()
+        if zip_val:
+            if not zip_val.isdigit():
+                raise forms.ValidationError("Delivery zip must be numeric.")
+            if not (100000 <= int(zip_val) <= 999999):
+                raise forms.ValidationError("Delivery zip must be a valid 6-digit Indian pincode.")
+        return zip_val

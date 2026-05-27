@@ -16,6 +16,7 @@ from django.http import (
     HttpResponse,
     HttpResponseServerError,
 )
+from django.db import transaction as db_transaction
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.utils import timezone
@@ -147,48 +148,71 @@ def _create_balance_from_payment(payment_record):
             currency_pair=currency_pair,
         ).first()
 
-        if balance:
-            # Already exists → increment safely
-            balance.bal_quantity = (balance.bal_quantity or Decimal("0")) + qty
-            balance.balance_as_of = timezone.now()
-            balance.save(
-                update_fields=["bal_quantity", "balance_as_of"]
-            )
+        # if balance:
+        #     # Already exists → increment safely
+        #     balance.bal_quantity = (balance.bal_quantity or Decimal("0")) + qty
+        #     balance.balance_as_of = timezone.now()
+        #     balance.save(
+        #         update_fields=["bal_quantity", "balance_as_of"]
+        #     )
 
-            logger.info(
-                "Balance UPDATED: custRefNo=%s pair=%s +%s (new=%s)",
-                custRefNo,
-                currency_pair,
-                qty,
-                balance.bal_quantity,
-            )
+        #     logger.info(
+        #         "Balance UPDATED: custRefNo=%s pair=%s +%s (new=%s)",
+        #         custRefNo,
+        #         currency_pair,
+        #         qty,
+        #         balance.bal_quantity,
+        #     )
 
-        else:
-            # Create new balance row
-            balance = Balance.objects.create(
-                custRefNo=custRefNo,
-                currency_pair=currency_pair,
-                bal_quantity=qty,
-                blocked_quantity=Decimal("0"),
-                balance_as_of=timezone.now(),
-                date_created=timezone.now(),
-            )
+        # else:
+        #     # Create new balance row
+        #     balance = Balance.objects.create(
+        #         custRefNo=custRefNo,
+        #         currency_pair=currency_pair,
+        #         bal_quantity=qty,
+        #         blocked_quantity=Decimal("0"),
+        #         balance_as_of=timezone.now(),
+        #         date_created=timezone.now(),
+        #     )
 
-            logger.info(
-                "Balance CREATED: custRefNo=%s pair=%s qty=%s",
-                custRefNo,
-                currency_pair,
-                qty,
-            )
+        #     logger.info(
+        #         "Balance CREATED: custRefNo=%s pair=%s qty=%s",
+        #         custRefNo,
+        #         currency_pair,
+        #         qty,
+        #     )
 
-        # ----------------------------
-        # 5) MARK PAYMENT AS PROCESSED
-        # ----------------------------
-        # Mark ONLY after DB write succeeded
-        if not balance_already_marked:
-            meta["balance_created"] = True
-            payment_record.metadata = meta
-            payment_record.save(update_fields=["metadata"])
+        # # ----------------------------
+        # # 5) MARK PAYMENT AS PROCESSED
+        # # ----------------------------
+        # # Mark ONLY after DB write succeeded
+        # if not balance_already_marked:
+        #     meta["balance_created"] = True
+        #     payment_record.metadata = meta
+        #     payment_record.save(update_fields=["metadata"])
+
+        
+
+        with db_transaction.atomic():
+            if balance:
+                balance.bal_quantity = (balance.bal_quantity or Decimal("0")) + qty
+                balance.balance_as_of = timezone.now()
+                balance.save(update_fields=["bal_quantity", "balance_as_of"])
+            else:
+                balance = Balance.objects.create(
+                    custRefNo=custRefNo,
+                    currency_pair=currency_pair,
+                    bal_quantity=qty,
+                    blocked_quantity=Decimal("0"),
+                    balance_as_of=timezone.now(),
+                    date_created=timezone.now(),
+                )
+
+            # MARK PAYMENT AS PROCESSED inside same transaction
+            if not balance_already_marked:
+                meta["balance_created"] = True
+                payment_record.metadata = meta
+                payment_record.save(update_fields=["metadata"])
 
         return True
 

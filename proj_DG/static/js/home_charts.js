@@ -3,7 +3,7 @@
 // ===============================
 
 const HOURS_RANGE = 8;
-const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
 // -------------------------------
 // GOLD CHART

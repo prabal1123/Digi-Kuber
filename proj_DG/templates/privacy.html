@@ -1,0 +1,772 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Privacy Policy — DigitalKuber</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: rgba(201,168,76,0.18);
+      --bg: #0a0906;
+      --surface: #111009;
+      --border: rgba(201,168,76,0.15);
+      --text: #e8e0d0;
+      --muted: #8a7e6a;
+      --white: #faf6ef;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.75;
+      font-size: 16px;
+      min-height: 100vh;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10,9,6,0.9);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      letter-spacing: 0.08em;
+      text-decoration: none;
+    }
+
+    .logo span {
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      margin-left: 6px;
+      vertical-align: middle;
+      position: relative;
+      top: -2px;
+    }
+
+    .last-updated {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 5;
+      padding: 80px 48px 60px;
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(201,168,76,0.07), transparent 70%);
+    }
+
+    .hero-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-label::before {
+      content: '';
+      display: inline-block;
+      width: 30px; height: 1px;
+      background: var(--gold);
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      max-width: 680px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .hero-sub {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 540px;
+    }
+
+    /* ── LAYOUT ── */
+    .page-wrap {
+      position: relative;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 48px 80px;
+      gap: 0 60px;
+    }
+
+    /* ── TOC ── */
+    .toc {
+      padding-top: 48px;
+    }
+
+    .toc-sticky {
+      position: sticky;
+      top: 40px;
+    }
+
+    .toc-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .toc-list {
+      list-style: none;
+      border-left: 1px solid var(--border);
+    }
+
+    .toc-list li a {
+      display: block;
+      padding: 7px 16px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s, border-color 0.2s;
+      border-left: 2px solid transparent;
+      margin-left: -1px;
+      line-height: 1.4;
+    }
+
+    .toc-list li a:hover {
+      color: var(--gold-light);
+      border-left-color: var(--gold);
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      padding-top: 48px;
+    }
+
+    .section {
+      margin-bottom: 56px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.5s forwards;
+    }
+
+    .section:last-child {
+      border-bottom: none;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section:nth-child(1)  { animation-delay: 0.05s; }
+    .section:nth-child(2)  { animation-delay: 0.10s; }
+    .section:nth-child(3)  { animation-delay: 0.15s; }
+    .section:nth-child(4)  { animation-delay: 0.20s; }
+    .section:nth-child(5)  { animation-delay: 0.25s; }
+    .section:nth-child(6)  { animation-delay: 0.30s; }
+    .section:nth-child(7)  { animation-delay: 0.35s; }
+    .section:nth-child(8)  { animation-delay: 0.40s; }
+    .section:nth-child(9)  { animation-delay: 0.45s; }
+    .section:nth-child(10) { animation-delay: 0.50s; }
+    .section:nth-child(11) { animation-delay: 0.55s; }
+
+    .section-number {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    .section p {
+      color: var(--text);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .section p:last-child { margin-bottom: 0; }
+
+    .section ul, .section ol {
+      padding-left: 0;
+      list-style: none;
+      margin: 16px 0;
+    }
+
+    .section ul li, .section ol li {
+      position: relative;
+      padding-left: 22px;
+      font-size: 0.92rem;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.65;
+    }
+
+    .section ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-size: 0.85rem;
+    }
+
+    .section ol {
+      counter-reset: item;
+    }
+
+    .section ol li::before {
+      counter-increment: item;
+      content: counter(item, decimal-leading-zero) ".";
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+    }
+
+    /* ── HIGHLIGHT BOX ── */
+    .highlight-box {
+      background: var(--gold-dim);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      border-radius: 4px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .highlight-box strong {
+      color: var(--gold-light);
+      font-weight: 500;
+    }
+
+    /* ── TABLE ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.87rem;
+    }
+
+    .data-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-align: left;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 400;
+    }
+
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(201,168,76,0.07);
+      color: var(--text);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+
+    .data-table tr:hover td { background: rgba(201,168,76,0.04); }
+
+    /* ── CONTACT BOX ── */
+    .contact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px 32px;
+      margin-top: 12px;
+    }
+
+    .contact-card p {
+      margin-bottom: 8px;
+    }
+
+    .contact-card a {
+      color: var(--gold-light);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(201,168,76,0.3);
+      transition: border-color 0.2s;
+    }
+
+    .contact-card a:hover {
+      border-bottom-color: var(--gold);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 5;
+      border-top: 1px solid var(--border);
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+    }
+
+    footer p {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.78rem;
+    }
+
+    /* ── BACK TO TOP ── */
+    .back-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: color 0.2s;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .back-top:hover { color: var(--gold); }
+
+    .back-top::before {
+      content: '↑';
+      font-size: 0.9rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 780px) {
+      header { padding: 20px 24px; }
+      .hero { padding: 50px 24px 40px; }
+      .page-wrap {
+        grid-template-columns: 1fr;
+        padding: 0 24px 60px;
+      }
+      .toc { display: none; }
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Legal Documentation</div>
+    <h1>Your Privacy, <em>Our Commitment</em></h1>
+    <p class="hero-sub">This policy explains how DigitalKuber Technologies Pvt. Ltd. collects, uses, stores, and protects your personal information when you use our platform.</p>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="page-wrap">
+
+    <!-- TABLE OF CONTENTS -->
+    <aside class="toc">
+      <div class="toc-sticky">
+        <p class="toc-title">Contents</p>
+        <ul class="toc-list">
+          <li><a href="#s1">1. Introduction</a></li>
+          <li><a href="#s2">2. Information We Collect</a></li>
+          <li><a href="#s3">3. How We Use Your Data</a></li>
+          <li><a href="#s4">4. Data Sharing</a></li>
+          <li><a href="#s5">5. Cookies & Tracking</a></li>
+          <li><a href="#s6">6. KYC & Regulatory</a></li>
+          <li><a href="#s7">7. Data Security</a></li>
+          <li><a href="#s8">8. Data Retention</a></li>
+          <li><a href="#s9">9. Your Rights</a></li>
+          <li><a href="#s10">10. Children's Privacy</a></li>
+          <li><a href="#s11">11. Contact Us</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- CONTENT SECTIONS -->
+    <main class="content">
+
+      <div class="section" id="s1">
+        <span class="section-number">01 / 11</span>
+        <h2>Introduction</h2>
+        <p>DigitalKuber Technologies Pvt. Ltd. ("DigitalKuber", "we", "us", or "our") operates the digital gold and silver investment platform accessible at <strong>digitalquber.com</strong> and its associated mobile applications.</p>
+        <p>This Privacy Policy describes how we handle personal information you provide or that is generated when you use our services — including buying, selling, leasing, and managing digital precious metals.</p>
+        <div class="highlight-box">
+          <strong>Scope:</strong> This policy applies to all users of the DigitalKuber platform — registered account holders, visitors, and anyone transacting through our services. By creating an account or continuing to use the platform, you agree to the practices described here.
+        </div>
+        <p>We are committed to complying with the <strong>Information Technology Act, 2000</strong>, the <strong>IT (Amendment) Act, 2008</strong>, the <strong>IT (Reasonable Security Practices and Procedures) Rules, 2011</strong>, and all applicable SEBI, RBI, and PMLA regulations.</p>
+      </div>
+
+      <div class="section" id="s2">
+        <span class="section-number">02 / 11</span>
+        <h2>Information We Collect</h2>
+        <p>We collect information in several ways depending on how you interact with our platform.</p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Data Collected</th>
+              <th>When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Account Identity</strong></td>
+              <td>Full name, email address, mobile number, date of birth</td>
+              <td>Registration & profile setup</td>
+            </tr>
+            <tr>
+              <td><strong>KYC Documents</strong></td>
+              <td>PAN card number, Aadhaar number, proof type and document IDs</td>
+              <td>Identity verification</td>
+            </tr>
+            <tr>
+              <td><strong>Address Details</strong></td>
+              <td>Billing address, delivery address, PIN code, state code</td>
+              <td>Account and delivery setup</td>
+            </tr>
+            <tr>
+              <td><strong>Financial Data</strong></td>
+              <td>Transaction amounts, quote IDs, gold/silver holdings, payment records</td>
+              <td>During trades and payments</td>
+            </tr>
+            <tr>
+              <td><strong>Payment Information</strong></td>
+              <td>Razorpay order IDs, payment IDs, transaction status (we do not store card details)</td>
+              <td>At checkout</td>
+            </tr>
+            <tr>
+              <td><strong>Device & Usage Data</strong></td>
+              <td>IP address, browser type, session identifiers, page views, timestamps</td>
+              <td>Continuously while using the platform</td>
+            </tr>
+            <tr>
+              <td><strong>Communications</strong></td>
+              <td>Emails, OTPs, support messages you send us</td>
+              <td>When you contact us or verify identity</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>We do not collect sensitive financial information such as full bank account numbers, card numbers, or CVVs. Payment processing is handled securely by <strong>Razorpay</strong> and is subject to their own privacy terms.</p>
+      </div>
+
+      <div class="section" id="s3">
+        <span class="section-number">03 / 11</span>
+        <h2>How We Use Your Data</h2>
+        <p>We use your information strictly for purposes that serve you and fulfil our legal obligations. Specifically:</p>
+        <ul>
+          <li>To create and manage your DigitalKuber account and user profile</li>
+          <li>To verify your identity and complete KYC obligations required by SEBI and PMLA regulations</li>
+          <li>To process transactions — buying, selling, leasing, and delivery of gold and silver</li>
+          <li>To generate trade quotes, validate orders, and execute transactions via our partner MMTC-PAMP</li>
+          <li>To maintain your digital vault balance and transaction history</li>
+          <li>To send OTPs, transaction alerts, and essential account notifications</li>
+          <li>To prevent fraud, unauthorised access, and money laundering</li>
+          <li>To improve our platform through usage analytics (anonymised)</li>
+          <li>To comply with tax reporting, audit, and legal disclosure requirements</li>
+          <li>To respond to customer support enquiries</li>
+        </ul>
+        <div class="highlight-box">
+          <strong>We do not use your personal data for advertising, profiling, or sale to third-party marketers.</strong> DigitalKuber does not serve advertisements and does not allow advertisers to target you using your data.
+        </div>
+      </div>
+
+      <div class="section" id="s4">
+        <span class="section-number">04 / 11</span>
+        <h2>Data Sharing &amp; Disclosure</h2>
+        <p>We share your information only as necessary to operate the platform and fulfil our legal obligations. Recipients include:</p>
+        <ul>
+          <li><strong>MMTC-PAMP India Pvt. Ltd.</strong> — our vault and trading partner. Your customer reference number, KYC status, name, address, and transaction data are shared to create your metal account and execute trades.</li>
+          <li><strong>Razorpay Software Pvt. Ltd.</strong> — our payment gateway, to process and verify payments. They operate under their own Privacy Policy.</li>
+          <li><strong>Azure Communication Services (Microsoft)</strong> — used to deliver OTPs and verification emails.</li>
+          <li><strong>AWS (Amazon Web Services)</strong> — cloud infrastructure hosting for our application and static files.</li>
+          <li><strong>Regulatory Authorities</strong> — including SEBI, Income Tax Department, Financial Intelligence Unit (FIU-IND), and law enforcement agencies, where required by law.</li>
+          <li><strong>Auditors &amp; Legal Advisors</strong> — who are bound by professional confidentiality obligations.</li>
+        </ul>
+        <p>We do not sell, rent, or trade your personal data to any third party for commercial purposes. Any third party we engage is bound by data processing agreements and required to maintain appropriate security standards.</p>
+      </div>
+
+      <div class="section" id="s5">
+        <span class="section-number">05 / 11</span>
+        <h2>Cookies &amp; Session Tracking</h2>
+        <p>We use cookies and session tokens to maintain your login state, prevent CSRF attacks, and improve your experience on the platform. Specifically:</p>
+        <ul>
+          <li><strong>Session cookies</strong> — to keep you logged in and maintain transaction state (e.g., active quote during checkout)</li>
+          <li><strong>CSRF tokens</strong> — security tokens embedded in forms to prevent cross-site request forgery attacks</li>
+          <li><strong>API session identifiers</strong> — to authenticate requests to our trading partner MMTC-PAMP on your behalf</li>
+        </ul>
+        <p>We do not use third-party advertising cookies or tracking pixels. We do not use Google Analytics or similar commercial tracking services that profile you across the web.</p>
+        <p>You can disable cookies via your browser settings, but doing so will prevent you from logging in or completing transactions on the platform.</p>
+      </div>
+
+      <div class="section" id="s6">
+        <span class="section-number">06 / 11</span>
+        <h2>KYC &amp; Regulatory Compliance</h2>
+        <p>As an investment platform dealing in precious metals, we are required by Indian law to collect, verify, and retain KYC (Know Your Customer) information. This includes:</p>
+        <ul>
+          <li>Government-issued photo identification (PAN card)</li>
+          <li>Address proof (Aadhaar card)</li>
+          <li>Mobile number and email address for OTP-based authentication</li>
+          <li>Date of birth for age verification</li>
+        </ul>
+        <div class="highlight-box">
+          <strong>PMLA Compliance:</strong> Under the Prevention of Money Laundering Act, 2002 and SEBI guidelines, we are required to maintain KYC records for a minimum of 5 years after account closure, and may be obligated to report certain transactions to the Financial Intelligence Unit (FIU-IND).
+        </div>
+        <p>Your KYC status (Valid / Invalid / Pending) is synced with MMTC-PAMP and determines your ability to execute trades. We cannot delete KYC data while regulatory retention obligations remain in force.</p>
+      </div>
+
+      <div class="section" id="s7">
+        <span class="section-number">07 / 11</span>
+        <h2>Data Security</h2>
+        <p>We implement industry-standard technical and organisational safeguards to protect your personal data from unauthorised access, disclosure, alteration, or destruction:</p>
+        <ul>
+          <li>All data is transmitted over HTTPS/TLS encrypted connections</li>
+          <li>Passwords are hashed using Django's built-in PBKDF2 algorithm with salt — we never store plaintext passwords</li>
+          <li>Payment data is handled entirely by Razorpay (PCI-DSS compliant) — we store only order IDs and statuses</li>
+          <li>OTPs expire within 10 minutes and are marked as used upon verification</li>
+          <li>CSRF protection is enforced on all state-changing requests</li>
+          <li>Our infrastructure is hosted on secured AWS EC2 instances with controlled access</li>
+          <li>Static assets and media are served via Amazon CloudFront CDN</li>
+          <li>Database access is restricted to application processes only</li>
+        </ul>
+        <p>Despite these measures, no system is completely secure. In the event of a data breach that is likely to affect your rights and freedoms, we will notify affected users and the relevant authorities as required by law.</p>
+      </div>
+
+      <div class="section" id="s8">
+        <span class="section-number">08 / 11</span>
+        <h2>Data Retention</h2>
+        <p>We retain your personal data for as long as necessary to fulfil the purposes described in this policy and to comply with our legal obligations.</p>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Data Type</th>
+              <th>Retention Period</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Account and profile data</td>
+              <td>Duration of account + 3 years after closure</td>
+            </tr>
+            <tr>
+              <td>KYC documents and verification records</td>
+              <td>Minimum 5 years (PMLA requirement)</td>
+            </tr>
+            <tr>
+              <td>Transaction and payment records</td>
+              <td>7 years (Income Tax Act requirement)</td>
+            </tr>
+            <tr>
+              <td>Session and activity logs</td>
+              <td>90 days</td>
+            </tr>
+            <tr>
+              <td>Support communications</td>
+              <td>3 years</td>
+            </tr>
+            <tr>
+              <td>OTP verification records</td>
+              <td>30 days</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>After retention periods expire, data is securely deleted or anonymised in accordance with our data lifecycle management policy.</p>
+      </div>
+
+      <div class="section" id="s9">
+        <span class="section-number">09 / 11</span>
+        <h2>Your Rights</h2>
+        <p>As a user of DigitalKuber, you have the following rights with respect to your personal data:</p>
+        <ol>
+          <li><strong>Right to Access</strong> — You may request a copy of the personal data we hold about you.</li>
+          <li><strong>Right to Correction</strong> — You may update your profile information at any time via your account settings. For KYC corrections, contact our support team.</li>
+          <li><strong>Right to Withdraw Consent</strong> — Where processing is based on your consent, you may withdraw it. Note that this may affect your ability to use the platform.</li>
+          <li><strong>Right to Account Closure</strong> — You may request closure of your account. We will retain data only to the extent required by law.</li>
+          <li><strong>Right to Grievance Redressal</strong> — You may raise a complaint with our Grievance Officer (see Section 11).</li>
+          <li><strong>Right to Portability</strong> — You may request your transaction and account data in a machine-readable format.</li>
+        </ol>
+        <div class="highlight-box">
+          <strong>Note:</strong> Certain rights cannot be exercised where they conflict with our legal obligations — for example, we cannot delete KYC data during the statutory retention period mandated under PMLA.
+        </div>
+        <p>To exercise any of the above rights, contact us at <strong>support@digitalquber.com</strong>. We will respond within 30 days.</p>
+      </div>
+
+      <div class="section" id="s10">
+        <span class="section-number">10 / 11</span>
+        <h2>Children's Privacy</h2>
+        <p>DigitalKuber is a financial investment platform intended exclusively for adults. Our services are not directed to, and we do not knowingly collect personal information from, individuals under the age of 18.</p>
+        <p>Registration requires acceptance of our Terms of Service and completion of KYC, which implicitly confirms that the user is a legal adult. If we become aware that a minor has created an account, we will promptly close the account and delete any personal data collected.</p>
+        <p>If you believe your child has registered on our platform, please contact us immediately at <strong>support@digitalquber.com</strong>.</p>
+      </div>
+
+      <div class="section" id="s11">
+        <span class="section-number">11 / 11</span>
+        <h2>Contact &amp; Grievance Officer</h2>
+        <p>For any privacy-related queries, requests, or complaints, you may contact us through the following channels:</p>
+        <div class="contact-card">
+          <p><strong style="color: var(--gold-light);">Grievance Officer</strong></p>
+          <p>DigitalKuber Technologies Pvt. Ltd.</p>
+          <p>📧 <a href="mailto:support@digitalquber.com">support@digitalquber.com</a></p>
+          <p>📞 1800-123-4567 (Mon–Fri, 10:00 AM – 6:00 PM IST)</p>
+          <p>📍 Mumbai, Maharashtra, India</p>
+        </div>
+        <p style="margin-top: 20px;">We aim to acknowledge all grievances within <strong>48 hours</strong> and resolve them within <strong>30 days</strong> of receipt. If you are unsatisfied with our response, you may escalate to the Ministry of Electronics and Information Technology (MeitY) or the relevant sectoral regulator.</p>
+        <p>We reserve the right to update this Privacy Policy from time to time. Material changes will be communicated via email or a prominent notice on the platform. Continued use of the platform after changes constitutes acceptance of the revised policy.</p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+<footer class="footer-dark pt-5 pb-3">
+  <div class="container">
+
+    <div class="row gy-4">
+
+      <div class="col-lg-4 col-md-6">
+        <div class="d-flex align-items-center mb-3">
+          <div class="logo-circle">D</div>
+          <h4 class="ms-2 mb-0 fw-semibold text-white">DigitalKuber</h4>
+        </div>
+
+        <p class="text-white">
+          India's most trusted platform for digital gold and silver investments.
+        </p>
+
+        <div class="d-flex gap-3 mt-3">
+          <a href="#" class="text-white fs-4"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="text-white fs-4"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="text-white fs-4"><i class="bi bi-linkedin"></i></a>
+          <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-2 col-md-6">
+        <h5 class="fw-semibold mb-3 text-white">Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="footer-link">Buy Gold</a></li>
+          <li><a href="#" class="footer-link">Buy Silver</a></li>
+          <li><a href="#" class="footer-link">Sell Metals</a></li>
+          <li><a href="#" class="footer-link">Gold Lease</a></li>
+          <li><a href="#" class="footer-link">Gold Loan</a></li>
+          <li><a href="#" class="footer-link">Live Prices</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-2 col-md-6">
+        <h5 class="fw-semibold mb-3 text-white">Company</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="footer-link">About Us</a></li>
+          <li><a href="#" class="footer-link">Careers</a></li>
+          <li><a href="#" class="footer-link">Blog</a></li>
+          <li><a href="#" class="footer-link">Terms</a></li>
+          <li><a href="{% url 'privacy' %}" class="footer-link">Privacy</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <h5 class="fw-semibold mb-3 text-white">Contact Us</h5>
+        <p class="text-white mb-2">
+          <i class="bi bi-envelope me-2 text-warning"></i>support@digitalkuber.com
+        </p>
+        <p class="text-white mb-2">
+          <i class="bi bi-telephone me-2 text-warning"></i>1800-123-4567
+        </p>
+        <p class="text-white mb-0">
+          <i class="bi bi-geo-alt me-2 text-warning"></i>
+          Mumbai, Maharashtra, India
+        </p>
+      </div>
+
+    </div>
+
+    <hr class="footer-divider">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between small text-white">
+      <p class="mb-1">
+        © 2025 DigitalKuber Technologies Pvt. Ltd. All rights reserved.
+      </p>
+      <p class="mb-1">
+        Regulated by SEBI • ISO 27001 • PCI DSS
+      </p>
+    </div>
+
+  </div>
+</footer>
+
+</body>
+</html>
+
+{% endblock %}

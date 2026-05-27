@@ -42,4 +42,4 @@ updateHomePrices();
 
 // Update every 5 seconds (unchanged)
 // setInterval(updateHomePrices, 5000);
-setInterval(updateHomePrices, 60000);
+setInterval(updateHomePrices, 2 * 60 * 1000);
